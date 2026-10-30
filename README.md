@@ -52,3 +52,28 @@ Variáveis de ambiente opcionais: `IBE_MAX_MIN` (duração máxima, padrão 12 m
 - `static/`: o app (interface, motor de áudio, modo offline)
 
 Use o Ibe Music com músicas que você tem o direito de usar.
+
+## Desenvolvimento
+
+Com o Python do projeto e o Node.js no PATH, instale uma vez as dependências de teste:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+```
+
+Depois execute `testar.bat` (ou `.\testar.bat` no PowerShell). Esse comando roda os testes
+Python e `node --test tests/engine.test.mjs`, sem instalar nada e sem baixar modelos,
+com orçamento de execução inferior a 60 segundos. A instalação inicial das dependências
+pode precisar de internet; a execução dos testes funciona offline.
+
+Os testes de API substituem apenas o separador de IA por um falso antes de importar
+`app.py` e direcionam `IBE_WORKDIR` para uma pasta temporária exclusiva, preservando
+`work/` e as músicas reais. Usam leitura e gravação reais com soundfile, sem FFmpeg.
+Os testes Python bloqueiam rede externa e importações de torch/torchaudio/Demucs.
+A análise usa sinais sintéticos; o motor é carregado em uma VM do Node, sem npm.
+
+Nesta etapa, bugs encontrados são documentados como `xfail`/`skip`, sem modificar o app.
+Há uma reprodução adicional conhecida a 22.050 Hz: após 100 ms de mudo, o resíduo
+é `0.0031866133` (critério `<= 0.0001`). O caso fica marcado como `skip` somente para
+esse valor conhecido. Os cinco critérios obrigatórios do motor passam a 44.100 Hz,
+a taxa nominal solicitada pelo app. Nenhuma tolerância foi relaxada.
