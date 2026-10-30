@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F6F7F9">
+<meta name="description" content="Separe as faixas, mude o tom e a velocidade e veja os acordes de qualquer música.">
+<title>Ibe Music</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ibe Music">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <span class="logo"><svg viewBox="0 0 22 22" aria-hidden="true"><rect x="1" y="7" width="3.4" height="8" rx="1.7" fill="#3D3BD9"/><rect x="6.5" y="3" width="3.4" height="16" rx="1.7" fill="#D98A2B"/><rect x="12" y="5.5" width="3.4" height="11" rx="1.7" fill="#1F8A70"/><rect x="17.5" y="8.5" width="3.4" height="5" rx="1.7" fill="#8A5BC2"/></svg>Ibe Music</span>
+    <nav class="tabs" role="tablist" aria-label="Seções">
+      <button type="button" role="tab" id="tab-lib" aria-controls="lib" aria-selected="true">Biblioteca</button>
+      <button type="button" role="tab" id="tab-studio" aria-controls="studio" aria-selected="false">Estúdio</button>
+    </nav>
+    <button type="button" class="icon-btn" id="btn-settings" aria-label="Ajustes"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
+  </header>
+
+  <main>
+    <section id="lib" class="view on" role="tabpanel" aria-labelledby="tab-lib">
+      <div class="upload" id="drop">
+        <div class="upload-text">
+          <h2>Envie uma música</h2>
+          <p class="sub">MP3, WAV, M4A ou FLAC. As faixas são separadas no servidor e ficam salvas neste navegador.</p>
+        </div>
+        <div class="upload-row">
+          <div class="seg" role="radiogroup" aria-label="Quantidade de faixas">
+            <button type="button" role="radio" aria-checked="true" data-stems="4">4 faixas</button>
+            <button type="button" role="radio" aria-checked="false" data-stems="6">6 faixas</button>
+          </div>
+          <label class="btn primary">Escolher arquivo<input type="file" id="file" accept="audio/*,.mp3,.wav,.m4a,.flac,.ogg,.aac" multiple hidden></label>
+        </div>
+        <p class="hint" id="stems-hint">Voz, bateria, baixo e outros instrumentos.</p>
+        <p class="warn" id="server-off" hidden>O servidor não respondeu. As músicas já salvas continuam funcionando; confira o endereço em Ajustes.</p>
+      </div>
+
+      <div class="jobs" id="jobs"></div>
+
+      <div class="lib-tools">
+        <div class="chips" id="playlists"></div>
+        <input type="search" id="search" class="field" placeholder="Buscar música" aria-label="Buscar música">
+      </div>
+      <div class="pl-actions" id="pl-actions" hidden>
+        <button type="button" class="link" id="pl-rename">Renomear playlist</button>
+        <button type="button" class="link danger" id="pl-delete">Excluir playlist</button>
+      </div>
+      <div class="list" id="songs"></div>
+    </section>
+
+    <section id="studio" class="view" role="tabpanel" aria-labelledby="tab-studio">
+      <div class="empty" id="studio-empty">
+        <p>Escolha uma música na biblioteca para abrir o estúdio.</p>
+        <button type="button" class="btn" id="go-lib">Ir para a biblioteca</button>
+      </div>
+
+      <div id="studio-main" hidden>
+        <div class="song-head">
+          <h1 id="s-title"></h1>
+          <div class="chips"><span class="chip" id="c-key"></span><span class="chip" id="c-bpm"></span><span class="chip" id="c-stems"></span></div>
+        </div>
+        <p class="loading" id="studio-loading" hidden>Carregando as faixas…</p>
+
+        <div id="studio-body">
+          <div class="card chords" id="chords-card">
+            <div class="chord-now" aria-live="off">
+              <span class="now" id="chord-now">–</span>
+              <span class="next"><small>Próximo</small><b id="chord-next"></b></span>
+            </div>
+            <div class="strip" aria-hidden="true"><div class="track" id="track"></div><div class="mark"></div></div>
+          </div>
+
+          <div class="card lyrics-card">
+            <div class="card-head">
+              <h2>Letra</h2>
+              <div class="row">
+                <button type="button" class="sm" id="ly-sync" hidden>Sincronizar</button>
+                <button type="button" class="sm" id="ly-edit">Adicionar letra</button>
+              </div>
+            </div>
+            <div class="sync-bar" id="sync-bar" hidden>
+              <p>Dê o play e toque em <b>Marcar linha</b> quando cada verso começar.</p>
+              <div class="row">
+                <button type="button" class="btn primary" id="sync-mark">Marcar linha</button>
+                <button type="button" class="btn" id="sync-undo">Desfazer</button>
+                <button type="button" class="btn" id="sync-done">Concluir</button>
+              </div>
+            </div>
+            <div class="lyrics" id="lyrics"></div>
+          </div>
+
+          <div class="card lanes" id="lanes"></div>
+
+          <div class="controls">
+            <div class="box">
+              <h3>Tom</h3>
+              <div class="step">
+                <button type="button" id="p-minus" aria-label="Baixar meio tom">−</button>
+                <span><b id="p-val">0</b><small id="p-sub"></small></span>
+                <button type="button" id="p-plus" aria-label="Subir meio tom">+</button>
+              </div>
+            </div>
+            <div class="box">
+              <h3>Velocidade <button type="button" class="link" id="sp-reset">Normal</button></h3>
+              <b class="big" id="sp-val">100%</b>
+              <input type="range" id="sp" min="50" max="150" step="5" value="100" aria-label="Velocidade">
+            </div>
+            <div class="box">
+              <h3>Repetir trecho</h3>
+              <p class="sub small" id="lp-info"></p>
+              <div class="row">
+                <button type="button" class="tg" id="lp-a">Marcar A</button>
+                <button type="button" class="tg" id="lp-b">Marcar B</button>
+                <button type="button" class="tg" id="lp-on" aria-pressed="false">Repetir</button>
+                <button type="button" class="link" id="lp-clear">Limpar</button>
+              </div>
+            </div>
+            <div class="box">
+              <h3>Metrônomo</h3>
+              <div class="row">
+                <button type="button" class="tg" id="mt-on" aria-pressed="false">Desligado</button>
+                <div class="seg small" role="radiogroup" aria-label="Ajuste do BPM" id="mt-mult">
+                  <button type="button" role="radio" data-mult="0.5" aria-checked="false">½×</button>
+                  <button type="button" role="radio" data-mult="1" aria-checked="true">1×</button>
+                  <button type="button" role="radio" data-mult="2" aria-checked="false">2×</button>
+                </div>
+              </div>
+              <div class="row">
+                <label class="sub small" for="mt-meter">Compasso</label>
+                <select id="mt-meter" class="field small"><option value="2">2/4</option><option value="3">3/4</option><option value="4" selected>4/4</option><option value="6">6/8</option></select>
+                <input type="range" id="mt-vol" min="0" max="100" value="70" aria-label="Volume do metrônomo">
+              </div>
+            </div>
+          </div>
+
+          <div class="card export">
+            <h2>Exportar</h2>
+            <div class="export-list" id="ex-stems"></div>
+            <button type="button" class="btn" id="ex-mix">Baixar mix com tom, velocidade e volumes atuais (WAV)</button>
+            <p class="sub small" id="ex-status" hidden></p>
+          </div>
+
+          <div class="transport">
+            <div class="seekrow">
+              <span class="time" id="t-cur">0:00</span>
+              <input type="range" id="seek" min="0" max="1" step="0.01" value="0" aria-label="Posição na música">
+              <span class="time" id="t-dur">0:00</span>
+            </div>
+            <div class="buttons">
+              <button type="button" class="tg" id="b-back" aria-label="Voltar 5 segundos">−5s</button>
+              <button type="button" class="play" id="b-play" aria-label="Tocar"></button>
+              <button type="button" class="tg" id="b-fwd" aria-label="Avançar 5 segundos">+5s</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<dialog id="dlg"></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

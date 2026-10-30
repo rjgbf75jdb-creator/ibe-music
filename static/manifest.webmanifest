@@ -1,0 +1,16 @@
+{
+  "name": "Ibe Music",
+  "short_name": "Ibe Music",
+  "description": "Separe as faixas, mude o tom e a velocidade e veja os acordes de qualquer música.",
+  "lang": "pt-BR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F6F7F9",
+  "theme_color": "#F6F7F9",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
