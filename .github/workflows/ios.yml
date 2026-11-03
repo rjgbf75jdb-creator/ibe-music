@@ -1,0 +1,48 @@
+# Compila o app de iPhone num Mac do GitHub e gera um .ipa sem assinatura.
+# A assinatura acontece na hora de instalar (Sideloadly ou AltStore, com o seu Apple ID).
+name: App iOS
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'static/**'
+      - 'app-ios/**'
+      - '.github/workflows/ios.yml'
+
+jobs:
+  ipa:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: app-ios
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar dependências
+        run: npm ci || npm install
+
+      - name: Copiar a interface para o app
+        run: npm run sync
+
+      - name: Compilar
+        run: |
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build
+
+      - name: Montar o .ipa
+        run: |
+          mkdir -p Payload
+          cp -R build/Build/Products/Release-iphoneos/App.app Payload/
+          zip -qr IbeMusic.ipa Payload
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: IbeMusic-ipa
+          path: app-ios/IbeMusic.ipa

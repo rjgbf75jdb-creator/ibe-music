@@ -1,0 +1,8 @@
+{
+  "appId": "com.gabrielsilva.ibemusic",
+  "appName": "Ibe Music",
+  "webDir": "www",
+  "ios": {
+    "contentInset": "always"
+  }
+}
