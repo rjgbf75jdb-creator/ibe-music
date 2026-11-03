@@ -12,7 +12,8 @@ on:
 
 jobs:
   ipa:
-    runs-on: macos-latest
+    # Mac Intel: os Macs arm64 (macos-latest) estavam sem vaga na fila do GitHub
+    runs-on: macos-15-intel
     defaults:
       run:
         working-directory: app-ios
